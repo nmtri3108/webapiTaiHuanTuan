@@ -1,46 +1,45 @@
 using Microsoft.AspNetCore.Mvc;
-using WebApiTaiHuanTuan.Data;
 using WebApiTaiHuanTuan.Models;
+using WebApiTaiHuanTuan.Services.IServices;
 
 namespace WebApiTaiHuanTuan.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+// http://localhost:5000/api/Category
 public class CategoryController : ControllerBase
 {
-    private readonly ApplicationDbContext _db;
+    private readonly ICategoryService _categoryService;
 
-    public CategoryController(ApplicationDbContext db)
+    public CategoryController(ICategoryService categoryService)
     {
-        _db = db;
+        _categoryService = categoryService;
     }
 
     [HttpGet]
     // GET http://localhost:5000/api/Category
     public IEnumerable<Category> GetAll()
     {
-        return _db.Categories.ToList();
+        return _categoryService.GetAll();
     }
 
     [HttpGet("{id:int}")]
     // GET http://localhost:5000/api/Category/{id}
     public Category GetById(int id)
     {
-        return _db.Categories.Find(id);
+        return _categoryService.GetById(id);
     }
     
     [HttpDelete("{id:int}")]
     // Delete http://localhost:5000/api/Category/{id}
     public IActionResult Delete(int id)
     {
-        var category = _db.Categories.Find(id);
-        if (category == null)
+        var result = _categoryService.Delete(id);
+        
+        if (!result)
         {
             return NotFound();
         }
-
-        _db.Categories.Remove(category);
-        _db.SaveChanges();
         
         return Ok();
     }
@@ -49,24 +48,15 @@ public class CategoryController : ControllerBase
     // Post http://localhost:5000/api/Category
     public IActionResult Create([FromBody] Category category)
     {
-        _db.Categories.Add(category);
-        _db.SaveChanges();
-        
+        _categoryService.Create(category);
         return StatusCode(201);
     }
     
     [HttpPut("{id:int}")]
     // Put http://localhost:5000/api/Category/{id}
-    public IActionResult Create([FromRoute] int id, [FromBody] Category category)
+    public IActionResult Update([FromRoute] int id, [FromBody] Category category)
     {
-        var categoryDb = _db.Categories.Find(id);
-        
-        categoryDb.Description = category.Description;
-        categoryDb.Name = category.Name;
-       
-        _db.Categories.Update(categoryDb);
-        _db.SaveChanges();
-        
+        _categoryService.Update(id, category);
         return StatusCode(201);
     }
 }

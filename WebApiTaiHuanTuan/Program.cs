@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using WebApiTaiHuanTuan;
 using WebApiTaiHuanTuan.Data;
+using WebApiTaiHuanTuan.Services;
+using WebApiTaiHuanTuan.Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
